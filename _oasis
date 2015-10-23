@@ -12,3 +12,16 @@ Library aobuffer
   Findlibname:    aobuffer
   Modules:        Aobuffer
   BuildDepends:   bytes
+
+Executable test
+  Path:           lib_test/
+  MainIs:         test.ml
+  Build$:         flag(tests)
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   aobuffer
+
+Test test_aobuffer
+  Run$:               flag(tests)
+  Command:            $test
+  WorkingDirectory:   lib_test
