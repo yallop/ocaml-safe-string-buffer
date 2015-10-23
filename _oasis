@@ -19,7 +19,7 @@ Executable test
   Build$:         flag(tests)
   CompiledObject: best
   Install:        false
-  BuildDepends:   aobuffer
+  BuildDepends:   aobuffer,ounit
 
 Test test_aobuffer
   Run$:               flag(tests)
