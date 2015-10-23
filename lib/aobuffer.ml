@@ -93,7 +93,7 @@ struct
         (fun i s ->
            let l = String.length s in
            Bytes.blit_string s 0 b (i - l) l;
-           i - 1)
+           i - l)
         len
         buf
     in
