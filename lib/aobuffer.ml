@@ -114,7 +114,7 @@ module Mutable =
 struct
   type t = { mutable elements: Immutable.t }
 
-  let create _ = { elements = Immutable.empty }
+  let create () = { elements = Immutable.empty }
 
   let add_string buf s =
     buf.elements <- Immutable.add_string buf.elements s

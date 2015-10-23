@@ -1,5 +1,5 @@
 type t
-val create : int -> t
+val create : unit -> t
 val contents : t -> string
 val to_bytes : t -> bytes
 val length : t -> int
