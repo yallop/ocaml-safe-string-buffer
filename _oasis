@@ -1,0 +1,38 @@
+OASISFormat:      0.4
+Name:             aobuffer
+Version:          0.1.0
+Synopsis:         Append-only buffer
+Authors:          Jeremy Yallop
+License:          MIT
+Plugins:          META (0.3), DevFiles (0.3)
+BuildTools:       ocamlbuild
+
+Library aobuffer
+  Path:           lib/
+  Findlibname:    aobuffer
+  Modules:        Aobuffer
+  BuildDepends:   bytes
+
+Executable test
+  Path:           lib_test/
+  MainIs:         test.ml
+  Build$:         flag(tests)
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   hex, cstruct
+
+Test test_hex
+  Run$:               flag(tests)
+  Command:            $test
+  WorkingDirectory:   lib_test
+
+AlphaFeatures: ocamlbuild_more_args
+
+Document hex
+  Type: ocamlbuild (0.3)
+  BuildTools: ocamldoc
+  Title: API reference for Hex
+  XOCamlbuildPath: .
+  XOCamlbuildExtraArgs:
+    "-docflags '-t ocaml-hex -colorize-code -short-functors -charset utf-8'"
+  XOCamlbuildLibraries: hex
