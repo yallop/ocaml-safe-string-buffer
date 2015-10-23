@@ -56,7 +56,7 @@ sig
 
   val add_subbytes : t -> bytes -> int -> int -> t
 
-  val add_buffer : t -> t -> t
+  val add_aobuffer : t -> t -> t
 
   (* val add_channel : t -> in_channel -> int -> unit *)
 
@@ -107,45 +107,10 @@ struct
   let output_buffer outch elements =
     iter_elements (output_string outch) elements
 
-  let add_buffer = (@)
+  let add_aobuffer = (@)
 end
 
-module Mutable :
-sig
-  type t
-
-  val create : int -> t
-
-  val contents : t -> string
-
-  val to_bytes : t -> bytes
-
-  (* val sub : t -> int -> int -> string *)
-
-  (* val blit : t -> int -> bytes -> int -> int -> unit *)
-
-  (* val nth : t -> int -> char *) (* TODO *)
-
-  val length : t -> int
-
-  val clear : t -> unit
-
-  val add_char : t -> char -> unit
-
-  val add_string : t -> string -> unit
-
-  val add_bytes : t -> bytes -> unit
-
-  val add_substring : t -> string -> int -> int -> unit
-
-  val add_subbytes : t -> bytes -> int -> int -> unit
-
-  val add_buffer : t -> t -> unit
-
-  (* val add_channel : t -> in_channel -> int -> unit *)
-
-  val output_buffer : out_channel -> t -> unit
-end =
+module Mutable =
 struct
   type t = { mutable elements: Immutable.t }
 
@@ -170,6 +135,8 @@ struct
 
   let clear buf = buf.elements <- Immutable.empty
 
+  let reset = clear
+
   let to_bytes buf = Immutable.to_bytes buf.elements
 
   let contents buf = Bytes.unsafe_to_string (to_bytes buf)
@@ -177,9 +144,15 @@ struct
   let output_buffer outch {elements} =
     Immutable.output_buffer outch elements
 
-  let add_buffer l r =
-    l.elements <- Immutable.add_buffer r.elements l.elements
+  let add_aobuffer l r =
+    l.elements <- Immutable.add_aobuffer r.elements l.elements
+
+  let add_buffer buf b =
+    add_string buf (Buffer.contents b)
 end
+
+include Mutable
 
 let formatter_of_aobuffer buf =
   Format.make_formatter (Mutable.add_substring buf) ignore
+ 
