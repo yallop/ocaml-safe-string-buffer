@@ -99,7 +99,10 @@ struct
     in
     b
 
-  let contents buf = Bytes.unsafe_to_string (to_bytes buf)
+  let contents = function
+      [] -> ""
+    | [s] -> s
+    | buf -> Bytes.unsafe_to_string (to_bytes buf)
 
   let iter_elements f elements =
     List.fold_right (fun elem () -> ignore (f elem)) elements ()
