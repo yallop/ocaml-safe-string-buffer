@@ -222,6 +222,18 @@ struct
     then invalid_arg "blit"
     else
       blit_loop buf.elements srcofs dst dstofs length
+
+  let sub buf ofs length =
+    if length < 0 || ofs < 0 || ofs > buf.length - length
+    then invalid_arg "sub"
+    else
+      let b = Bytes.create length in
+      begin
+        blit buf ofs b 0 length;
+        Bytes.unsafe_to_string b
+      end
+      
+    
 end
 
 module type S =
