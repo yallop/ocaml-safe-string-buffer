@@ -19,4 +19,6 @@ val output_buffer : out_channel -> t -> unit
 val contents : t -> string
 val to_bytes : t -> bytes
 
+val bprintf : t -> ('a, unit, string, unit) format4 -> 'a
+
 val formatter_of_aobuffer : t -> Format.formatter
