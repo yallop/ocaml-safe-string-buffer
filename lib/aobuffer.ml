@@ -30,7 +30,7 @@ end
 
 module Immutable :
 sig
-  type t
+  type t = string list
 
   val empty : t
 
@@ -41,8 +41,6 @@ sig
   (* val sub : t -> int -> int -> string *)
 
   (* val blit : t -> int -> bytes -> int -> int -> unit *)
-
-  (* val nth : t -> int -> char *) (* TODO *)
 
   val length : t -> int
 
@@ -116,6 +114,7 @@ end
 module Mutable =
 struct
   type t =
+    (* Invariant: the length is the sum of the length of the elements *)
     { mutable elements: Immutable.t; mutable length: int }
 
   let create () =
@@ -178,6 +177,20 @@ struct
 
   let add_buffer buf b =
     add_string buf (Buffer.contents b)
+
+  let nth buf i =
+    if i < 0 || i >= buf.length then invalid_arg "nth" else
+      let rec loop length = function
+          [] ->
+          (* Invariant violated: the bounds check above should have
+             caught this case *)
+          assert false
+        | s :: ss ->
+          let slen = String.length s in
+          let sslen = length - slen in
+          if i >= sslen then s.[i - sslen]
+          else loop sslen ss
+      in loop buf.length buf.elements
 end
 
 module type S =
@@ -202,6 +215,8 @@ sig
   val output_buffer : out_channel -> t -> unit
   val contents : t -> string
   val to_bytes : t -> bytes
+
+  val nth : t -> int -> char
 end
 
 
@@ -214,56 +229,53 @@ struct
     if xcontents = ycontents then true
     else Printf.ksprintf failwith "%s <> %s" xcontents ycontents
 
-  let add f g =
-    fun {x;y} v ->
-      begin
-        assert (equal x y);
-        f x v;
-        g y v;
-        assert (equal x y)
-      end
-
-  let add3 (f : _ -> _ -> _ -> _ -> unit) g =
-    fun {x;y} a b c ->
-      begin
-        assert (equal x y);
-        f x a b c;
-        g y a b c;
-        assert (equal x y)
-      end
-
-  let op1_unit f g =
-    fun {x;y} ->
-      begin
-        assert (equal x y);
-        let () = f x in
-        let () = g y in
-        assert (equal x y)
-      end
-
-  let op1 f g =
+  let op0 f g =
     fun {x; y} ->
       begin
         assert (equal x y);
         let r1 = f x in
         let r2 = g y in
+        assert (equal x y);
         assert (r1 = r2);
         r1
       end
 
-  let add_string   = add X.add_string Y.add_string
-  let add_bytes    = add X.add_bytes  Y.add_bytes
-  let add_char     = add X.add_char   Y.add_char
-  let add_buffer   = add X.add_buffer Y.add_buffer
-  let clear        = op1_unit X.clear  Y.clear
-  let reset        = op1_unit X.reset  Y.reset
-  let length       = op1  X.length Y.length
-  let to_bytes     = op1  X.to_bytes Y.to_bytes
-  let contents     = op1  X.contents Y.contents
-  (* let add_aobuffer = add X.add_aobuffer Y.add_aobuffer *)
+  let op1 f g =
+    fun {x; y} v ->
+      begin
+        assert (equal x y);
+        let r1 = f x v in
+        let r2 = g y v in
+        assert (equal x y);
+        assert (r1 = r2);
+        r1
+      end
 
-  let add_substring = add3 X.add_substring Y.add_substring
-  let add_subbytes  = add3 X.add_subbytes Y.add_subbytes
+  let op3 f g =
+    fun {x;y} a b c ->
+      begin
+        assert (equal x y);
+        let r1 = f x a b c in
+        let r2 = g y a b c in
+        assert (equal x y);
+        assert (r1 = r2);
+        r1
+      end
+
+  let add_string   = op1 X.add_string Y.add_string
+  let add_bytes    = op1 X.add_bytes  Y.add_bytes
+  let add_char     = op1 X.add_char   Y.add_char
+  let add_buffer   = op1 X.add_buffer Y.add_buffer
+  let clear        = op0 X.clear  Y.clear
+  let reset        = op0 X.reset  Y.reset
+  let length       = op0 X.length Y.length
+  let to_bytes     = op0 X.to_bytes Y.to_bytes
+  let contents     = op0 X.contents Y.contents
+  let nth          = op1 X.nth Y.nth
+  (* let add_aobuffer = op1 X.add_aobuffer Y.add_aobuffer *)
+
+  let add_substring = op3 X.add_substring Y.add_substring
+  let add_subbytes  = op3 X.add_subbytes Y.add_subbytes
 
   let create () =
     let x = X.create () in

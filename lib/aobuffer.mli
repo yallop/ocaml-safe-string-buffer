@@ -14,6 +14,13 @@ val add_substring : t -> string -> int -> int -> unit
 val add_subbytes : t -> bytes -> int -> int -> unit
 val add_buffer : t -> Buffer.t -> unit
 val add_aobuffer : t -> t -> unit
+val nth : t -> int -> char
+
+(* TODO:
+(* val add_channel : t -> in_channel -> int -> unit *) (* TODO *)
+       (* The value `blit' is required but not provided *)
+       (* The value `sub' is required but not provided *)
+*)
 
 val output_buffer : out_channel -> t -> unit
 val contents : t -> string
