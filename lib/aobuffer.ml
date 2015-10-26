@@ -1,22 +1,21 @@
 module Check_safe_string_used =
 struct
   (* The Aobuffer module must be compiled with -safe-string, since it assumes
-     that strings passed in are not subsequently modified elsewhere.  This
-     module (Check_safe_string_used) checks statically that -safe-string is in
-     use.  If -safe-string is used then bytes and string are distinct types,
-     and so the pattern match in check_safe_string_used could never match
-     Is_string.  If -safe_string is not used then the Is_string case could be
-     matched and so the pattern match is inexhaustive, triggering a fatal
-     error. *)
+     that strings passed in are not subsequently modified elsewhere.  The
+     Check_safe_string_used module checks statically that -safe-string is in
+     use. *)
   type _ safe_string_check =
-      Not_string : _ safe_string_check
+    (* The index of Anything can be refined to any type *)
+      Anything : _ safe_string_check
+    (* The index of Is_sting can only be refined to type string *)
     | Is_string : string safe_string_check
           
-  (* Check that the -safe-string is used.  See the comment at the top
-     of the Check_safe_string_used module *)
+  (* Check that the -safe-string is used.  Iff -safe-string is enabled then
+     bytes and string are incompatible types, and so the pattern matching is
+     exhaustive. *)
   [@@@ocaml.warning "@8"]
   let check_safe_string_used : bytes safe_string_check -> unit = function
-      Not_string -> ()
+      Anything -> ()
 end
 
 
