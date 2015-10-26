@@ -62,9 +62,6 @@ sig
 end =
 struct
   (* Kept in reversed order *)
-  
-  (* TODO: add a string Weak.t option cache.  We could even add a
-     cache at each link in the chain. *)
   type t = string list
 
   let empty = []
@@ -164,6 +161,7 @@ struct
 
   let to_bytes buf = Immutable.to_bytes buf.elements
 
+  (* TODO: this could be memoized with a weak reference. *)
   let contents buf = Bytes.unsafe_to_string (to_bytes buf)
 
   let output_buffer outch { elements } =
@@ -191,6 +189,39 @@ struct
           if i >= sslen then s.[i - sslen]
           else loop sslen ss
       in loop buf.length buf.elements
+
+  let string_list_len : string list -> int = Immutable.length 
+
+  let rec blit_loop elements srcofs dst dstofs length =
+    match elements with
+      [] -> assert false
+    | last :: firsts ->
+      let first_len = string_list_len firsts in
+      let last_len = String.length last in
+
+      (* Case 1: the string to copy lies entirely within last *)
+      if srcofs >= first_len then
+        Bytes.blit_string last (srcofs - first_len) dst dstofs length
+
+      (* Case 2: the string to copy lies entirely within firsts *)
+      else if srcofs + length < first_len then
+        blit_loop firsts srcofs dst dstofs length
+
+      (* Case 3: the string to copy lies partly within firsts and
+         partly within last. *)
+      else
+        let nchars = srcofs + length - first_len in
+        begin
+          Bytes.blit_string last 0 dst (dstofs + length - nchars) nchars ;
+          blit_loop firsts srcofs dst dstofs (length - nchars)
+        end
+
+  let blit buf srcofs dst dstofs length =
+    if length < 0 || srcofs < 0 || srcofs > buf.length - length
+                  || dstofs < 0 || dstofs > (Bytes.length dst) - length
+    then invalid_arg "blit"
+    else
+      blit_loop buf.elements srcofs dst dstofs length
 end
 
 module type S =
