@@ -10,7 +10,7 @@ BuildTools:       ocamlbuild
 Library aobuffer
   Path:           lib/
   Findlibname:    aobuffer
-  Modules:        Aobuffer
+  Modules:        Aobuffer,Aobuffer_extras
   BuildDepends:   bytes
 
 Executable test
