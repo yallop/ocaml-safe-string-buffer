@@ -109,7 +109,7 @@ let nth buf i =
 
 let rec blit_loop elements elements_len srcofs dst dstofs length =
   match elements with
-    [] -> assert false
+    [] -> ()
   | last :: firsts ->
     let last_len = String.length last in
     let first_len = elements_len - last_len in
