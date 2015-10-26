@@ -115,28 +115,51 @@ end
 
 module Mutable =
 struct
-  type t = { mutable elements: Immutable.t }
+  type t =
+    { mutable elements: Immutable.t; mutable length: int }
 
-  let create () = { elements = Immutable.empty }
+  let create () =
+    { elements = Immutable.empty; length = 0 }
 
   let add_string buf s =
-    buf.elements <- Immutable.add_string buf.elements s
+    begin
+      buf.elements <- Immutable.add_string buf.elements s;
+      buf.length <- buf.length + String.length s
+    end
 
   let add_bytes buf b =
-    buf.elements <- Immutable.add_bytes buf.elements b
+    begin
+      buf.elements <- Immutable.add_bytes buf.elements b;
+      buf.length <- buf.length + Bytes.length b
+    end
 
   let add_char buf c =
-    buf.elements <- Immutable.add_char buf.elements c
+    begin
+      buf.elements <- Immutable.add_char buf.elements c;
+      buf.length <- buf.length + 1
+    end
 
-  let length { elements } = Immutable.length elements
+  let length { length } = length
 
   let add_subbytes buf b ofs len =
-    add_string buf (Bytes.sub_string b ofs len)
+    (* TODO: check bounds upfront *)
+    begin
+      add_string buf (Bytes.sub_string b ofs len);
+      buf.length <- buf.length + len;
+    end
 
   let add_substring buf b ofs len =
-    add_string buf (String.sub b ofs len)
+    (* TODO: check bounds upfront *)
+    begin
+      add_string buf (String.sub b ofs len);
+      buf.length <- buf.length + len
+    end
 
-  let clear buf = buf.elements <- Immutable.empty
+  let clear buf =
+    begin
+      buf.elements <- Immutable.empty;
+      buf.length <- 0
+    end
 
   let reset = clear
 
@@ -144,11 +167,14 @@ struct
 
   let contents buf = Bytes.unsafe_to_string (to_bytes buf)
 
-  let output_buffer outch {elements} =
+  let output_buffer outch { elements } =
     Immutable.output_buffer outch elements
 
   let add_aobuffer l r =
-    l.elements <- Immutable.add_aobuffer r.elements l.elements
+    begin
+      l.elements <- Immutable.add_aobuffer r.elements l.elements;
+      l.length <- l.length + r.length
+    end
 
   let add_buffer buf b =
     add_string buf (Buffer.contents b)
