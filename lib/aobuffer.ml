@@ -40,12 +40,14 @@ let add_char buf c = add_string buf (String.make 1 c)
 let length { length } = length
 
 let add_subbytes buf b ofs len =
-  (* TODO: check bounds upfront *)
-  add_string buf (Bytes.sub_string b ofs len)
+  if ofs < 0 || len < 0 || ofs + len > Bytes.length b
+  then invalid_arg "add_subbytes"
+  else add_string buf (Bytes.sub_string b ofs len)
 
-let add_substring buf b ofs len =
-  (* TODO: check bounds upfront *)
-  add_string buf (String.sub b ofs len)
+let add_substring buf s ofs len =
+  if ofs < 0 || len < 0 || ofs + len > String.length s
+  then invalid_arg "add_subbytes"
+  else add_string buf (String.sub s ofs len)
 
 let clear buf =
   begin
