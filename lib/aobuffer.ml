@@ -83,8 +83,7 @@ let add_aobuffer l r =
     l.length <- l.length + r.length
   end
 
-let add_buffer buf b =
-  add_string buf (Buffer.contents b)
+let add_buffer buf b = add_string buf (Buffer.contents b)
 
 let nth buf i =
   if i < 0 || i >= buf.length then invalid_arg "nth" else
