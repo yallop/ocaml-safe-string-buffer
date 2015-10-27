@@ -35,11 +35,7 @@ let add_string buf s =
 
 let add_bytes buf b = add_string buf (Bytes.to_string b)
 
-let add_char buf c =
-  begin
-    buf.elements <- String.make 1 c :: buf.elements;
-    buf.length <- buf.length + 1
-  end
+let add_char buf c = add_string buf (String.make 1 c)
 
 let length { length } = length
 
