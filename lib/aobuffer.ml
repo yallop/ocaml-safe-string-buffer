@@ -18,14 +18,14 @@ struct
       Anything -> ()
 end
 
-
 type t =
-  (* Invariant: the length is the sum of the length of the elements.
-     The 'elements' list is kept in reverse order.  *)
-  { mutable elements: string list; mutable length: int }
+  { mutable elements: string list;
+    (** A buffer is stored as a list of elements, kept in reverse order; that
+        is, the first element on the list is the most recently added. *)
+    mutable length: int; 
+    (** The length field is the sum of the length of the elements. *) }
 
-let create () =
-  { elements = []; length = 0 }
+let create () = { elements = []; length = 0 }
 
 let add_string buf s =
   begin
@@ -33,11 +33,7 @@ let add_string buf s =
     buf.length <- buf.length + String.length s
   end
 
-let add_bytes buf b =
-  begin
-    buf.elements <- Bytes.to_string b ::  buf.elements;
-    buf.length <- buf.length + Bytes.length b
-  end
+let add_bytes buf b = add_string buf (Bytes.to_string b)
 
 let add_char buf c =
   begin
