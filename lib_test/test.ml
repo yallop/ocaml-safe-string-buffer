@@ -118,6 +118,26 @@ let test_sub _ =
   end
 
 
+let test_sub_invalid_args _ =
+  let buf = Aobuffer.create () in
+  let () = List.iter (Aobuffer.add_string buf)
+      ["abc"; ""; "def"; "ghi"] in
+  let test_invalid_bounds ~msg ofs len =
+    assert_raises ~msg (Invalid_argument "sub") @@ fun () ->
+    Aobuffer.sub buf ofs len
+  in
+  begin
+    test_invalid_bounds (-1) 1
+      ~msg:"Negative offset";
+    test_invalid_bounds 0 (-1)
+      ~msg:"Negative length";
+    test_invalid_bounds 0 (String.length (Aobuffer.contents buf) + 1)
+      ~msg:"Length too large";
+    test_invalid_bounds 1 (String.length (Aobuffer.contents buf))
+      ~msg:"Length too large (non-zero offset)";
+  end
+
+
 let suite = "Aobuffer tests" >::: [
     "length"
     >:: test_length;
@@ -145,8 +165,10 @@ let suite = "Aobuffer tests" >::: [
 
     "sub"
     >:: test_sub;
+
+    "sub: invalid arguments"
+    >:: test_sub_invalid_args;
 (*
-TODO: test invalid arguments to sub
 TODO: blit
 TODO: test invalid arguments to blit
 TODO: nth
