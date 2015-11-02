@@ -36,6 +36,7 @@ let test_add _ =
     let () = Aobuffer.add_string buf "bcd" in
     assert_equal "abcd" (Aobuffer.contents buf);
 
+
     let () = Aobuffer.add_bytes buf (Bytes.of_string "efg") in
     assert_equal "abcdefg" (Aobuffer.contents buf);
 
@@ -82,6 +83,18 @@ let test_formatter _ =
   assert_equal "x3z\n" (Aobuffer.contents buf)
 
 
+let test_to_bytes _ =
+  let buf = Aobuffer.create () in
+  let () = Aobuffer.add_string buf "a" in
+  let b1 = Aobuffer.to_bytes buf in
+  let b2 = Aobuffer.to_bytes buf in
+  begin
+    assert_equal (Bytes.of_string "a") b1;
+    assert_equal (Bytes.of_string "a") b2;
+    assert_bool "to_bytes allocates fresh values" (b1 != b2)
+  end
+
+
 let suite = "Aobuffer tests" >::: [
     "length"
     >:: test_length;
@@ -100,6 +113,17 @@ let suite = "Aobuffer tests" >::: [
 
     "test_formatter"
     >:: test_formatter;
+
+    "test_to_bytes"
+    >:: test_to_bytes;
+(*
+TODO: bprintf
+TODO: sub
+TODO: blit
+TODO: nth
+TODO: check that add_bytes copies
+*)
+
   ]
 
 
