@@ -146,8 +146,11 @@ let suite = "Aobuffer tests" >::: [
     "sub"
     >:: test_sub;
 (*
+TODO: test invalid arguments to sub
 TODO: blit
+TODO: test invalid arguments to blit
 TODO: nth
+TODO: test invalid arguments to nth
 *)
 
   ]
