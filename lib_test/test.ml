@@ -101,6 +101,23 @@ let test_to_bytes _ =
   end
 
 
+let test_sub _ =
+  let buf = Aobuffer.create () in
+  let () = List.iter (Aobuffer.add_string buf)
+      ["abc"; ""; "def"; "ghi"] in
+  let s = Aobuffer.contents buf in
+  let slen = String.length s in
+  begin
+    for ofs = 0 to slen - 1 do
+      for len = 0 to slen - ofs do
+        assert_equal
+          (Aobuffer.sub buf ofs len)
+          (String.sub s ofs len)
+      done
+    done
+  end
+
+
 let suite = "Aobuffer tests" >::: [
     "length"
     >:: test_length;
@@ -125,8 +142,10 @@ let suite = "Aobuffer tests" >::: [
 
     "to_bytes"
     >:: test_to_bytes;
+
+    "sub"
+    >:: test_sub;
 (*
-TODO: sub
 TODO: blit
 TODO: nth
 *)
