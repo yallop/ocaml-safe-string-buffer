@@ -47,6 +47,7 @@ let add_subbytes buf b ofs len =
 let add_substring buf s ofs len =
   if ofs < 0 || len < 0 || ofs + len > String.length s
   then invalid_arg "add_subbytes"
+  else if ofs = 0 && len = String.length s then add_string buf s 
   else add_string buf (String.sub s ofs len)
 
 let clear buf =
@@ -69,7 +70,10 @@ let to_bytes {elements; length} =
   in
   b
 
-let contents buf = Bytes.unsafe_to_string (to_bytes buf)
+let contents = function
+  { elements = [] } -> ""
+| { elements = [s] } -> s
+| buf -> Bytes.unsafe_to_string (to_bytes buf)
 
 let iter_elements f elements =
   List.fold_right (fun elem () -> ignore (f elem)) elements ()
