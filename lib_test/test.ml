@@ -83,6 +83,12 @@ let test_formatter _ =
   assert_equal "x3z\n" (Aobuffer.contents buf)
 
 
+let test_bprintf _ =
+  let buf = Aobuffer.create () in
+  let () = Aobuffer.bprintf buf "%d%s" 3 "four" in
+  assert_equal "3four" (Aobuffer.contents buf)
+
+
 let test_to_bytes _ =
   let buf = Aobuffer.create () in
   let () = Aobuffer.add_string buf "a" in
@@ -111,17 +117,18 @@ let suite = "Aobuffer tests" >::: [
     "reset"
     >:: test_reset;
 
-    "test_formatter"
+    "formatter"
     >:: test_formatter;
 
-    "test_to_bytes"
+    "bprintf"
+    >:: test_bprintf;
+
+    "to_bytes"
     >:: test_to_bytes;
 (*
-TODO: bprintf
 TODO: sub
 TODO: blit
 TODO: nth
-TODO: check that add_bytes copies
 *)
 
   ]
