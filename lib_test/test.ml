@@ -138,6 +138,24 @@ let test_sub_invalid_args _ =
   end
 
 
+let test_nth _ =
+  let buf = Aobuffer.create () in
+  begin
+    Aobuffer.add_string buf "abc";
+    assert_equal 'a' (Aobuffer.nth buf 0);
+    assert_equal 'b' (Aobuffer.nth buf 1);
+    assert_equal 'c' (Aobuffer.nth buf 2);
+
+    Aobuffer.add_string buf "def";
+    assert_equal 'a' (Aobuffer.nth buf 0);
+    assert_equal 'b' (Aobuffer.nth buf 1);
+    assert_equal 'c' (Aobuffer.nth buf 2);
+    assert_equal 'd' (Aobuffer.nth buf 3);
+    assert_equal 'e' (Aobuffer.nth buf 4);
+    assert_equal 'f' (Aobuffer.nth buf 5);
+  end
+
+
 let suite = "Aobuffer tests" >::: [
     "length"
     >:: test_length;
@@ -175,6 +193,8 @@ TODO: nth
 TODO: test invalid arguments to nth
 *)
 
+    "nth"
+    >:: test_nth;
   ]
 
 
