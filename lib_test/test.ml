@@ -155,6 +155,26 @@ let test_nth _ =
     assert_equal 'f' (Aobuffer.nth buf 5);
   end
 
+let test_nth_invalid_args _ =
+  let buf = Aobuffer.create () in
+  let test_invalid_bounds ~msg i =
+    assert_raises ~msg (Invalid_argument "nth") @@ fun () ->
+    Aobuffer.nth buf i
+  in
+  begin
+    test_invalid_bounds 0
+      ~msg:"accessing empty buffer";
+
+    Aobuffer.add_string buf "abc";
+    
+    test_invalid_bounds (-1)
+      ~msg:"negative index";
+
+    test_invalid_bounds 3
+      ~msg:"index out of range";
+  end
+
+
 
 let suite = "Aobuffer tests" >::: [
     "length"
@@ -195,6 +215,9 @@ TODO: test invalid arguments to nth
 
     "nth"
     >:: test_nth;
+
+    "nth"
+    >:: test_nth_invalid_args;
   ]
 
 
