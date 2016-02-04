@@ -99,3 +99,9 @@ val bprintf : t -> ('a, unit, string, unit) format4 -> 'a
 
 val formatter_of_aobuffer : t -> Format.formatter
 (** [TODO] *)
+
+val add_channel : t -> in_channel -> int -> unit
+(** [TODO] *)
+
+val add_substitute : t -> (string -> string) -> string -> unit
+(** [TODO] *)

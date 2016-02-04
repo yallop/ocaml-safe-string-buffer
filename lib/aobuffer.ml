@@ -147,3 +147,13 @@ let bprintf buf = Printf.kprintf (add_string buf)
 
 let formatter_of_aobuffer buf =
   Format.make_formatter (add_substring buf) ignore
+
+let add_channel buf channel n =
+  let b = Buffer.create 16 in
+  let () = Buffer.add_channel b channel n in
+  add_buffer buf b
+
+let add_substitute buf f s =
+  let b = Buffer.create 16 in
+  let () = Buffer.add_substitute b f s in
+  add_buffer buf b
