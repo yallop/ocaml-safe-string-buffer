@@ -175,6 +175,69 @@ let test_nth_invalid_args _ =
   end
 
 
+let test_blit _ =
+  let buf = Aobuffer.create () in
+  let () = Aobuffer.add_string buf "abc" in
+
+  begin
+    let bytes = Bytes.make 3 '3' in
+    let () = Aobuffer.blit buf 0 bytes 0 3 in
+    assert_equal (Bytes.of_string "abc") bytes;
+
+    let bytes = Bytes.make 3 '3' in
+    let () = Aobuffer.blit buf 0 bytes 0 2 in
+    assert_equal (Bytes.of_string "ab3") bytes;
+
+    let bytes = Bytes.make 3 '3' in
+    let () = Aobuffer.blit buf 0 bytes 1 2 in
+    assert_equal (Bytes.of_string "3ab") bytes;
+
+    let bytes = Bytes.make 3 '3' in
+    let () = Aobuffer.blit buf 1 bytes 0 2 in
+    assert_equal (Bytes.of_string "bc3") bytes;
+
+    let bytes = Bytes.make 3 '3' in
+    let () = Aobuffer.blit buf 1 bytes 1 2 in
+    assert_equal (Bytes.of_string "3bc") bytes;
+  end
+
+
+let test_blit_invalid_args _ =
+  let buf = Aobuffer.create () in
+  let () = Aobuffer.add_string buf "abc"
+  and smallbytes = Bytes.create 2
+  and bigbytes = Bytes.create 10 in
+  let test_invalid_bounds ~msg ~srcoff ~dst ~dstoff ~len : unit =
+    assert_raises ~msg (Invalid_argument "blit") @@ fun () ->
+    Aobuffer.blit buf srcoff dst dstoff len
+  in
+  begin
+    test_invalid_bounds
+      ~srcoff:(-1) ~dstoff:0 ~len:1
+      ~dst:smallbytes
+      ~msg:"Negative source offset";
+
+    test_invalid_bounds
+      ~srcoff:0 ~dstoff:0 ~len:4
+      ~dst:bigbytes
+      ~msg:"Source offset + len > length buf";
+
+    test_invalid_bounds
+      ~srcoff:1 ~dstoff:0 ~len:(-1)
+      ~dst:bigbytes
+      ~msg:"Negative len";
+
+    test_invalid_bounds
+      ~srcoff:0 ~dstoff:2 ~len:2
+      ~dst:smallbytes
+      ~msg:"Dst offset + len > length dst";
+
+    test_invalid_bounds
+      ~srcoff:0 ~dstoff:3 ~len:0
+      ~dst:smallbytes
+      ~msg:"Dst offset > length dst";
+  end
+
 
 let suite = "Aobuffer tests" >::: [
     "length"
@@ -206,12 +269,12 @@ let suite = "Aobuffer tests" >::: [
 
     "sub: invalid arguments"
     >:: test_sub_invalid_args;
-(*
-TODO: blit
-TODO: test invalid arguments to blit
-TODO: nth
-TODO: test invalid arguments to nth
-*)
+
+    "blit"
+    >:: test_blit;
+
+    "blit"
+    >:: test_blit_invalid_args;
 
     "nth"
     >:: test_nth;
@@ -219,6 +282,9 @@ TODO: test invalid arguments to nth
     "nth"
     >:: test_nth_invalid_args;
   ]
+
+(* TODO: add_subbytes, add_substring invalid arguments *)
+(* TODO: add_channel, add_substitute *)
 
 
 let _ =
