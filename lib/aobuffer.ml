@@ -150,8 +150,13 @@ let formatter_of_aobuffer buf =
 
 let add_channel buf channel n =
   let b = Buffer.create 16 in
-  let () = Buffer.add_channel b channel n in
-  add_buffer buf b
+  match Buffer.add_channel b channel n with
+    () -> add_buffer buf b
+  | exception (End_of_file as e) ->
+    begin
+      add_buffer buf b;
+      raise e
+    end
 
 let add_substitute buf f s =
   let b = Buffer.create 16 in
