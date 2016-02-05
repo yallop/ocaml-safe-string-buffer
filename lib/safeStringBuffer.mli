@@ -1,4 +1,4 @@
-(** A buffer implementation based on a rope representation.
+(** A buffer implementation optimized for immutable strings.
  * 
  * The interface is (almost) identical to the Buffer module in the
  * standard library, but this module is typically faster and has
@@ -63,8 +63,9 @@ val add_buffer : t -> Buffer.t -> unit
     O(1) time, allocates a couple of words and a copy of [Buffer.length buf]
     characters from [b]. *)
 
-val add_aobuffer : t -> t -> unit
-(** [add_aobuffer buf b] appends the contents of the buffer [b] to [buf].
+val add_safe_string_buffer : t -> t -> unit
+(** [add_safe_string_buffer buf b] appends the contents of the buffer [b] to
+    [buf].
 
     O(n) time in the number of elements (not characters) in [v], allocates a
     couple of words for each element in [v]. *)
@@ -109,5 +110,6 @@ val to_bytes : t -> bytes
 val bprintf : t -> ('a, unit, string, unit) format4 -> 'a
 (** [bprintf] behaves like {!Printf.bprintf}. *)
 
-val formatter_of_aobuffer : t -> Format.formatter
-(** [formatter_of_aobuffer] behaves like {!Format.formatter_of_buffer}. *)
+val formatter_of_safe_string_buffer : t -> Format.formatter
+(** [formatter_of_safe_string_buffer] behaves like
+    {!Format.formatter_of_buffer}. *)

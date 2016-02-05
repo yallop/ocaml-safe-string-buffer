@@ -1,16 +1,16 @@
 OASISFormat:      0.4
-Name:             aobuffer
+Name:             safe-string-buffer
 Version:          0.1.0
-Synopsis:         Append-only buffer
+Synopsis:         Buffer implementation optimized using -safe-string.
 Authors:          Jeremy Yallop
 License:          MIT
 Plugins:          META (0.3), DevFiles (0.3)
 BuildTools:       ocamlbuild
 
-Library aobuffer
+Library safe_string_buffer
   Path:           lib/
-  Findlibname:    aobuffer
-  Modules:        Aobuffer,Aobuffer_extras
+  Findlibname:    safe-string-buffer
+  Modules:        SafeStringBuffer
   BuildDepends:   bytes
 
 Executable test
@@ -19,9 +19,9 @@ Executable test
   Build$:         flag(tests)
   CompiledObject: best
   Install:        false
-  BuildDepends:   aobuffer,oUnit
+  BuildDepends:   safe-string-buffer,oUnit
 
-Test test_aobuffer
+Test test_safe_string_buffer
   Run$:               flag(tests)
   Command:            $test
   WorkingDirectory:   lib_test

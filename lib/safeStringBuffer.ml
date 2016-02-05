@@ -1,9 +1,9 @@
 module Check_safe_string_used =
 struct
-  (* The Aobuffer module must be compiled with -safe-string, since it assumes
-     that strings passed in are not subsequently modified elsewhere.  The
-     Check_safe_string_used module checks statically that -safe-string is in
-     use. *)
+  (* The SafeStringBuffer module must be compiled with -safe-string, since it
+     assumes that strings passed in are not subsequently modified elsewhere.
+     The Check_safe_string_used module checks statically that -safe-string is
+     in use. *)
   type _ safe_string_check =
     (* The index of Anything can be refined to any type *)
       Anything : _ safe_string_check
@@ -81,7 +81,7 @@ let iter_elements f elements =
 let output_buffer outch { elements } =
   iter_elements (output_string outch) elements
 
-let add_aobuffer l r =
+let add_safe_string_buffer l r =
   begin
     l.elements <- r.elements @ l.elements;
     l.length <- l.length + r.length
@@ -145,7 +145,7 @@ let sub buf ofs length =
     
 let bprintf buf = Printf.kprintf (add_string buf)
 
-let formatter_of_aobuffer buf =
+let formatter_of_safe_string_buffer buf =
   Format.make_formatter (add_substring buf) ignore
 
 let add_channel buf channel n =
