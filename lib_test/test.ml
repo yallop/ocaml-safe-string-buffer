@@ -113,6 +113,16 @@ let test_add _ =
        http://caml.inria.fr/mantis/view.php?id=7136 *)
     ()
     (* assert_equal "abc\n" (Aobuffer.contents buf) *)
+    ;
+
+    (* Simple tests for the success case only, since the behaviour of
+       add_substitute is not currently very precisely specified. *)
+    let buf = Aobuffer.create () in
+    let () = Aobuffer.add_substitute  buf
+        (function "x" -> "y" | "abc" -> "def" | s -> s)
+        "r$abc${x}s" in
+    assert_equal "rdefys"
+      (Aobuffer.contents buf)
   end
 
 
@@ -340,7 +350,6 @@ let suite = "Aobuffer tests" >::: [
     "nth"
     >:: test_nth_invalid_args;
   ]
-(* TODO: add_substitute *)
 
 let _ =
   run_test_tt_main suite
