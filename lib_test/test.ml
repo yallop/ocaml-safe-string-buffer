@@ -1,8 +1,7 @@
 open OUnit2
 
 let test_length _ =
-  let buf = SafeStringBuffer.create () in
-  begin
+  let buf = SafeStringBuffer.create 1 in  begin
     assert_equal 0 (SafeStringBuffer.length buf);
 
     let () = SafeStringBuffer.add_string buf "four" in
@@ -14,9 +13,8 @@ let test_length _ =
 
 
 let test_create _ =
-  let buf1 = SafeStringBuffer.create ()
-  and buf2 = SafeStringBuffer.create () in
-  begin
+  let buf1 = SafeStringBuffer.create 1
+  and buf2 = SafeStringBuffer.create 1 in  begin
     assert_bool "create builds physically-distinct buffers"
       (buf1 != buf2);
 
@@ -30,8 +28,7 @@ let test_create _ =
 let test_add _ =
   let test_invalid_bounds ~msg name f =
     assert_raises ~msg (Invalid_argument name) f in
-  let buf = SafeStringBuffer.create () in
-  begin
+  let buf = SafeStringBuffer.create 1 in  begin
     let () = SafeStringBuffer.add_char buf 'a' in
     assert_equal "a" (SafeStringBuffer.contents buf);
 
@@ -85,26 +82,24 @@ let test_add _ =
     let () = SafeStringBuffer.add_buffer buf buf2 in
     assert_equal "abcdefghijklmnopq" (SafeStringBuffer.contents buf);
 
-    let buf3 = SafeStringBuffer.create () in
+    let buf3 = SafeStringBuffer.create 1 in
     let () = SafeStringBuffer.add_string buf3 "rst" in
     let () = SafeStringBuffer.add_safe_string_buffer buf buf3 in
     assert_equal "abcdefghijklmnopqrst" (SafeStringBuffer.contents buf);
 
     (* test add_channel full read *)
-    let buf = SafeStringBuffer.create () in
+    let buf = SafeStringBuffer.create 1 in
     let fd = open_in "data.txt" in
     let () = SafeStringBuffer.add_channel buf fd 4 in
     assert_equal "abc\n" (SafeStringBuffer.contents buf);
 
     (* test add_channel partial read *)
-    let buf = SafeStringBuffer.create () in
-    let fd = open_in "data.txt" in
+    let buf = SafeStringBuffer.create 1 in    let fd = open_in "data.txt" in
     let () = SafeStringBuffer.add_channel buf fd 2 in
     assert_equal "ab" (SafeStringBuffer.contents buf);
 
     (* test add_channel short read. *)
-    let buf = SafeStringBuffer.create () in
-    let fd = open_in "data.txt" in
+    let buf = SafeStringBuffer.create 1 in    let fd = open_in "data.txt" in
     let () =
       assert_raises End_of_file @@ fun () ->
       SafeStringBuffer.add_channel buf fd 6
@@ -117,9 +112,8 @@ let test_add _ =
 
     (* Simple tests for the success case only, since the behaviour of
        add_substitute is not currently very precisely specified. *)
-    let buf = SafeStringBuffer.create () in
-    let () = SafeStringBuffer.add_substitute  buf
-        (function "x" -> "y" | "abc" -> "def" | s -> s)
+    let buf = SafeStringBuffer.create 1 in
+    let () = SafeStringBuffer.add_substitute  buf        (function "x" -> "y" | "abc" -> "def" | s -> s)
         "r$abc${x}s" in
     assert_equal "rdefys"
       (SafeStringBuffer.contents buf)
@@ -127,42 +121,39 @@ let test_add _ =
 
 
 let test_clear _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let () = SafeStringBuffer.add_string buf "abc" in
   assert_equal "abc" (SafeStringBuffer.contents buf);
-
   let () = SafeStringBuffer.clear buf in
   assert_equal "" (SafeStringBuffer.contents buf)
 
   
 let test_reset _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let () = SafeStringBuffer.add_string buf "abc" in
   assert_equal "abc" (SafeStringBuffer.contents buf);
-
   let () = SafeStringBuffer.reset buf in
   assert_equal "" (SafeStringBuffer.contents buf)
 
 
 let test_formatter _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let fmt = SafeStringBuffer.formatter_of_safe_string_buffer buf in
   let () = Format.fprintf fmt "x%az@." (fun fmt -> Format.fprintf fmt "%d") 3 in
   assert_equal "x3z\n" (SafeStringBuffer.contents buf)
 
 
 let test_bprintf _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let () = SafeStringBuffer.bprintf buf "%d%s" 3 "four" in
   assert_equal "3four" (SafeStringBuffer.contents buf)
 
 
 let test_to_bytes _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let () = SafeStringBuffer.add_string buf "a" in
   let b1 = SafeStringBuffer.to_bytes buf in
-  let b2 = SafeStringBuffer.to_bytes buf in
-  begin
+  let b2 = SafeStringBuffer.to_bytes buf in  begin
     assert_equal (Bytes.of_string "a") b1;
     assert_equal (Bytes.of_string "a") b2;
     assert_bool "to_bytes allocates fresh values" (b1 != b2)
@@ -170,9 +161,8 @@ let test_to_bytes _ =
 
 
 let test_sub _ =
-  let buf = SafeStringBuffer.create () in
-  let () = List.iter (SafeStringBuffer.add_string buf)
-      ["abc"; ""; "def"; "ghi"] in
+  let buf = SafeStringBuffer.create 1 in
+  let () = List.iter (SafeStringBuffer.add_string buf)      ["abc"; ""; "def"; "ghi"] in
   let s = SafeStringBuffer.contents buf in
   let slen = String.length s in
   begin
@@ -187,9 +177,8 @@ let test_sub _ =
 
 
 let test_sub_invalid_args _ =
-  let buf = SafeStringBuffer.create () in
-  let () = List.iter (SafeStringBuffer.add_string buf)
-      ["abc"; ""; "def"; "ghi"] in
+  let buf = SafeStringBuffer.create 1 in
+  let () = List.iter (SafeStringBuffer.add_string buf)      ["abc"; ""; "def"; "ghi"] in
   let test_invalid_bounds ~msg ofs len =
     assert_raises ~msg (Invalid_argument "sub") @@ fun () ->
     SafeStringBuffer.sub buf ofs len
@@ -207,8 +196,7 @@ let test_sub_invalid_args _ =
 
 
 let test_nth _ =
-  let buf = SafeStringBuffer.create () in
-  begin
+  let buf = SafeStringBuffer.create 1 in  begin
     SafeStringBuffer.add_string buf "abc";
     assert_equal 'a' (SafeStringBuffer.nth buf 0);
     assert_equal 'b' (SafeStringBuffer.nth buf 1);
@@ -224,8 +212,7 @@ let test_nth _ =
   end
 
 let test_nth_invalid_args _ =
-  let buf = SafeStringBuffer.create () in
-  let test_invalid_bounds ~msg i =
+  let buf = SafeStringBuffer.create 1 in  let test_invalid_bounds ~msg i =
     assert_raises ~msg (Invalid_argument "nth") @@ fun () ->
     SafeStringBuffer.nth buf i
   in
@@ -244,9 +231,8 @@ let test_nth_invalid_args _ =
 
 
 let test_blit _ =
-  let buf = SafeStringBuffer.create () in
+  let buf = SafeStringBuffer.create 1 in
   let () = SafeStringBuffer.add_string buf "abc" in
-
   begin
     let bytes = Bytes.make 3 '3' in
     let () = SafeStringBuffer.blit buf 0 bytes 0 3 in
@@ -271,9 +257,8 @@ let test_blit _ =
 
 
 let test_blit_invalid_args _ =
-  let buf = SafeStringBuffer.create () in
-  let () = SafeStringBuffer.add_string buf "abc"
-  and smallbytes = Bytes.create 2
+  let buf = SafeStringBuffer.create 1 in
+  let () = SafeStringBuffer.add_string buf "abc"  and smallbytes = Bytes.create 2
   and bigbytes = Bytes.create 10 in
   let test_invalid_bounds ~msg ~srcoff ~dst ~dstoff ~len : unit =
     assert_raises ~msg (Invalid_argument "blit") @@ fun () ->

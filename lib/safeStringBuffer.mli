@@ -8,8 +8,11 @@
 type t
 (** The type of buffers *)
 
-val create : unit -> t
-(** [create ()] creates an initially-empty buffer.
+val create : int -> t
+(** [create n] creates an initially-empty buffer.
+
+    The argument [n] is ignored; it's only there for compatibility with
+    {!Buffer.}
 
     O(1) time, allocates a couple of words. *)
 

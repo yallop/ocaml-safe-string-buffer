@@ -25,7 +25,7 @@ type t =
     mutable length: int; 
     (** The length field is the sum of the length of the elements. *) }
 
-let create () = { elements = []; length = 0 }
+let create _ = { elements = []; length = 0 }
 
 let add_string buf s =
   begin
