@@ -28,6 +28,8 @@ let test_create _ =
 
 
 let test_add _ =
+  let test_invalid_bounds ~msg name f =
+    assert_raises ~msg (Invalid_argument name) f in
   let buf = Aobuffer.create () in
   begin
     let () = Aobuffer.add_char buf 'a' in
@@ -43,8 +45,40 @@ let test_add _ =
     let () = Aobuffer.add_substring buf "abcdefghijklmno" 7 4 in
     assert_equal "abcdefghijk" (Aobuffer.contents buf);
 
+    let () = test_invalid_bounds "add_substring"
+        ~msg:"negative offset"
+        (fun () -> Aobuffer.add_substring buf "abc" (-1) 1); in
+
+    let () = test_invalid_bounds "add_substring"
+        ~msg:"negative length"
+        (fun () -> Aobuffer.add_substring buf "abc" 1 (-1)); in
+
+    let () = test_invalid_bounds "add_substring"
+        ~msg:"length > length(string)"
+        (fun () -> Aobuffer.add_substring buf "abc" 0 4); in
+
+    let () = test_invalid_bounds "add_substring"
+        ~msg:"offset + length > length(string)"
+        (fun () -> Aobuffer.add_substring buf "abc" 1 3); in
+
     let () = Aobuffer.add_subbytes buf (Bytes.of_string "abcdefghijklmno") 11 2 in
     assert_equal "abcdefghijklm" (Aobuffer.contents buf);
+
+    let () = test_invalid_bounds "add_subbytes"
+        ~msg:"negative offset"
+        (fun () -> Aobuffer.add_subbytes buf (Bytes.of_string "abc") (-1) 1); in
+
+    let () = test_invalid_bounds "add_subbytes"
+        ~msg:"negative length"
+        (fun () -> Aobuffer.add_subbytes buf (Bytes.of_string "abc") 1 (-1)); in
+
+    let () = test_invalid_bounds "add_subbytes"
+        ~msg:"length > length(bytes)"
+        (fun () -> Aobuffer.add_subbytes buf (Bytes.of_string "abc") 0 4); in
+
+    let () = test_invalid_bounds "add_subbytes"
+        ~msg:"offset + length > length(bytes)"
+        (fun () -> Aobuffer.add_subbytes buf (Bytes.of_string "abc") 1 3); in
 
     let buf2 = Buffer.create 10 in
     let () = Buffer.add_string buf2 "nopq" in
@@ -282,8 +316,6 @@ let suite = "Aobuffer tests" >::: [
     "nth"
     >:: test_nth_invalid_args;
   ]
-
-(* TODO: add_subbytes, add_substring invalid arguments *)
 (* TODO: add_channel, add_substitute *)
 
 
