@@ -16,3 +16,4 @@ remove: ["ocamlfind" "remove" "safe-string-buffer"]
 depends: [
   "ocamlfind" {build}
 ]
+available: [ ocaml-version >= "4.02.0" ]
