@@ -89,6 +89,30 @@ let test_add _ =
     let () = Aobuffer.add_string buf3 "rst" in
     let () = Aobuffer.add_aobuffer buf buf3 in
     assert_equal "abcdefghijklmnopqrst" (Aobuffer.contents buf);
+
+    (* test add_channel full read *)
+    let buf = Aobuffer.create () in
+    let fd = open_in "data.txt" in
+    let () = Aobuffer.add_channel buf fd 4 in
+    assert_equal "abc\n" (Aobuffer.contents buf);
+
+    (* test add_channel partial read *)
+    let buf = Aobuffer.create () in
+    let fd = open_in "data.txt" in
+    let () = Aobuffer.add_channel buf fd 2 in
+    assert_equal "ab" (Aobuffer.contents buf);
+
+    (* test add_channel short read. *)
+    let buf = Aobuffer.create () in
+    let fd = open_in "data.txt" in
+    let () =
+      assert_raises End_of_file @@ fun () ->
+      Aobuffer.add_channel buf fd 6
+    in
+    (* This is currently broken due to a bug in the standard library:
+       http://caml.inria.fr/mantis/view.php?id=7136 *)
+    ()
+    (* assert_equal "abc\n" (Aobuffer.contents buf) *)
   end
 
 
@@ -316,8 +340,7 @@ let suite = "Aobuffer tests" >::: [
     "nth"
     >:: test_nth_invalid_args;
   ]
-(* TODO: add_channel, add_substitute *)
-
+(* TODO: add_substitute *)
 
 let _ =
   run_test_tt_main suite
