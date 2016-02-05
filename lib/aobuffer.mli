@@ -29,79 +29,85 @@ val clear : t -> unit
 (** [clear] is an alias for [reset]. *)
 
 val add_char : t -> char -> unit
-(** [TODO]
+(** [add_char buf c] appends the char [c] to [buf].
 
-   O(1) time, allocates a couple of words. *)
+    O(1) time, allocates a couple of words. *)
 
 val add_string : t -> string -> unit
-(** [TODO]
+(** [add_string buf s] appends the string [s] to [buf]
 
     O(1) time, allocates a couple of words. *)
 
 val add_bytes : t -> bytes -> unit
-(** [TODO]
+(** [add_bytes buf s] appends the string [s] to [buf]
 
     O(1) time, allocates a couple of words and a copy of [b]. *)
 
 val add_substring : t -> string -> int -> int -> unit
-(** [TODO]
+(** [add_substring buf s offset len] appends the substring
+    [String.sub s offset len] to [buf].
 
-    O(1) time, allocates a couple of words and a copy of [n]
-    characters from [s]. *)
+    O(1) time, allocates a couple of words and a copy of [len] characters from
+    [s]. *)
 
 val add_subbytes : t -> bytes -> int -> int -> unit
-(** [TODO]
+(** [add_substring buf s offset len] appends the subsequence
+    [Bytes.sub s offset len] to [buf].
 
-    O(1) time, allocates a couple of words and a copy of [n] characters from
+    O(1) time, allocates a couple of words and a copy of [len] characters from
     [b]. *)
 
 val add_buffer : t -> Buffer.t -> unit
-(** [TODO]
+(** [add_buffer buf b] appends the contents of the buffer [b] to [buf].
 
     O(1) time, allocates a couple of words and a copy of [Buffer.length buf]
     characters from [b]. *)
 
 val add_aobuffer : t -> t -> unit
-(** [TODO]
+(** [add_aobuffer buf b] appends the contents of the buffer [b] to [buf].
 
     O(n) time in the number of elements (not characters) in [v], allocates a
     couple of words for each element in [v]. *)
 
+val add_channel : t -> in_channel -> int -> unit
+(** [add_channel buf in_channel n] reads up to [n] characters from
+    [in_channel] and appends them to [buf]. *)
+
+val add_substitute : t -> (string -> string) -> string -> unit
+(** [add_substitute] behaves like {!Buffer.add_substitute}. *)
+
 val nth : t -> int -> char
-(** [TODO]
+(** [nth buf n] returns the [n]th character of [buf].
 
     O(n) time in the number of elements (not characters) in [buf], does not
     allocate. *)
 
 val blit : t -> int -> bytes -> int -> int -> unit
-(** [TODO]
+(** [blit buf src_offset bytes dst_offset len] copies [len] characters from
+    [buf], starting at [src_offset], into [bytes], starting at [dst_offset].
 
     O(n) time in the number of elements (not characters) in [buf], does not
     allocate. *)
 
 val sub : t -> int -> int -> string
-(** [TODO]
+(** [sub buf offset len] extracts the substring of [buf] between [offset] and
+    [offset + len].
 
     O(n) time in the number of elements (not characters) in [buf], allocates a
     string of length [n]. *)
 
 val output_buffer : out_channel -> t -> unit
-(** [TODO] *)
+(** [outbut_buffer out_channel buf] writes the contents of [buf] on the
+    channel [out_channel]. *)
 
 val contents : t -> string
-(** [TODO] *)
+(** [contents buf] returns the contents of [buf] as a string. *)
 
 val to_bytes : t -> bytes
-(** [TODO] *)
+(** [to_bytes buf] returns the contents of [buf] as a bytes sequence. *)
 
 val bprintf : t -> ('a, unit, string, unit) format4 -> 'a
-(** [TODO] *)
+(** [bprintf] behaves like {!Printf.bprintf}. *)
 
 val formatter_of_aobuffer : t -> Format.formatter
-(** [TODO] *)
-
-val add_channel : t -> in_channel -> int -> unit
-(** [TODO] *)
-
-val add_substitute : t -> (string -> string) -> string -> unit
-(** [TODO] *)
+(** [formatter_of_aobuffer] behaves like {!Format.formatter_of_buffer}. *)
