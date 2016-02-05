@@ -10,9 +10,9 @@ struct
     (* The index of Is_sting can only be refined to type string *)
     | Is_string : string safe_string_check
           
-  (* Check that the -safe-string is used.  Iff -safe-string is enabled then
-     bytes and string are incompatible types, and so the pattern matching is
-     exhaustive. *)
+  (* Check that the -safe-string option is used.  Iff -safe-string is
+     enabled then bytes and string are incompatible types, and so the
+     pattern matching is exhaustive. *)
   [@@@ocaml.warning "@8"]
   let check_safe_string_used : bytes safe_string_check -> unit = function
       Anything -> ()
