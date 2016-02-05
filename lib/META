@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: cc0313c83836f956c422c616c22d7da7)
+version = "0.1.0"
+description = "Rope-based buffer implementation"
+requires = "bytes"
+archive(byte) = "ropebuffer.cma"
+archive(byte, plugin) = "ropebuffer.cma"
+archive(native) = "ropebuffer.cmxa"
+archive(native, plugin) = "ropebuffer.cmxs"
+exists_if = "ropebuffer.cma"
+# OASIS_STOP
+
