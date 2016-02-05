@@ -46,7 +46,7 @@ let add_subbytes buf b ofs len =
 
 let add_substring buf s ofs len =
   if ofs < 0 || len < 0 || ofs + len > String.length s
-  then invalid_arg "add_subbytes"
+  then invalid_arg "add_substring"
   else if ofs = 0 && len = String.length s then add_string buf s 
   else add_string buf (String.sub s ofs len)
 
